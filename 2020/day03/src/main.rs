@@ -41,7 +41,7 @@ fn main() {
         results.push(result);
     }
     println!(
-        "results: {:?}, product: {}",
+        "test results: {:?}, product: {}",
         results,
         results.iter().product::<usize>()
     );
@@ -56,7 +56,7 @@ fn main() {
         results.push(result);
     }
     println!(
-        "results: {:?}, product: {}",
+        "real results: {:?}, product: {}",
         results,
         results.iter().product::<usize>()
     );
