@@ -31,6 +31,7 @@ fn get_seat_id(row: usize, col: usize) -> usize {
     row * 8 + col
 }
 
+// TODO: can probably use max_by_key here?
 fn get_highest_seat_id(directions: &str) -> usize {
     let mut highest_seat_id = 0;
     for passport_direction in directions.lines() {
