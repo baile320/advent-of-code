@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,9 +36,23 @@ Instruction parse_instruction(char line[]) {
   return instruction;
 }
 
+// borrowed from:
+// https://stackoverflow.com/questions/9069205/how-do-i-free-memory-in-c
+char *readFile(char *filename) {
+  FILE *f = fopen(filename, "rt");
+  assert(f);
+  fseek(f, 0, SEEK_END);
+  long length = ftell(f);
+  fseek(f, 0, SEEK_SET);
+  char *buffer = (char *)malloc(length + 1);
+  buffer[length] = '\0';
+  fread(buffer, 1, length, f);
+  fclose(f);
+  return buffer;
+}
+
 int main() {
-  char test_directions[] =
-      "forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2\n";
+  char *test_directions = readFile("day2_test.txt");
 
   int test_horizontal_position = 0;
   int test_vertical_position = 0;
@@ -61,136 +76,7 @@ int main() {
          test_vertical_position, test_horizontal_position,
          test_vertical_position * test_horizontal_position);
 
-  char real_directions[] =
-      "forward 2\ndown 7\ndown 8\nforward 9\ndown 8\nforward 9\nforward "
-      "8\ndown 3\nforward 8\nforward 5\nup 2\ndown 9\ndown 4\nforward "
-      "4\nforward 3\ndown 8\ndown 9\nforward 5\ndown 1\nup 1\nforward 4\nup "
-      "5\nforward 2\ndown 6\nforward 9\nforward 3\nforward 7\ndown 6\ndown "
-      "1\nforward 8\ndown 3\nforward 1\nup 6\ndown 1\ndown 2\nforward 9\ndown "
-      "7\ndown 1\ndown 7\ndown 7\nup 5\ndown 8\nforward 6\nup 8\nup 2\nforward "
-      "6\nup 1\ndown 9\nforward 8\nforward 4\nup 3\nforward 7\ndown 2\ndown "
-      "8\nforward 5\ndown 9\nup 4\nforward 7\nforward 5\ndown 5\ndown "
-      "5\nforward 3\nforward 2\ndown 2\nup 4\nup 7\ndown 8\nup 8\nforward "
-      "1\nup 4\nforward 4\ndown 2\nforward 5\nforward 7\ndown 4\nforward "
-      "8\ndown 2\nforward 5\nforward 9\nforward 6\nforward 5\ndown 5\nforward "
-      "4\nforward 3\ndown 7\ndown 8\nforward 9\nforward 7\ndown 3\ndown "
-      "6\nforward 4\ndown 7\nup 9\ndown 8\nup 7\nup 3\nforward 6\nforward "
-      "9\ndown 2\ndown 3\ndown 1\ndown 3\nforward 8\nforward 3\nforward "
-      "9\ndown 5\nup 1\nup 2\ndown 9\nup 9\ndown 5\ndown 9\nforward 1\ndown "
-      "3\ndown 5\ndown 1\nforward 7\ndown 6\nforward 7\nforward 4\nup 2\nup "
-      "1\nforward 9\ndown 2\ndown 6\ndown 5\ndown 6\nforward 8\ndown "
-      "5\nforward 1\nforward 2\ndown 7\ndown 5\ndown 7\nup 9\ndown 9\nup "
-      "4\ndown 7\nup 8\ndown 9\nforward 3\ndown 6\ndown 2\nforward 9\ndown "
-      "4\nup 7\nforward 3\ndown 5\nforward 8\nforward 9\ndown 2\nup 5\nforward "
-      "2\nforward 9\nup 5\ndown 2\nforward 8\nforward 6\ndown 7\ndown "
-      "3\nforward 4\nforward 3\nforward 9\nup 4\nup 4\nforward 7\nup "
-      "3\nforward 6\ndown 7\nup 8\nforward 2\nup 1\ndown 6\nforward 4\nup "
-      "6\nup 6\nup 3\nforward 4\nforward 2\nforward 5\nforward 8\ndown 9\ndown "
-      "4\ndown 3\ndown 1\ndown 6\ndown 4\ndown 5\ndown 7\ndown 5\nup "
-      "4\nforward 3\ndown 4\ndown 7\ndown 7\ndown 2\nforward 2\nforward 9\nup "
-      "6\ndown 3\nup 9\nforward 8\ndown 9\nup 2\nup 2\nup 2\nup 1\ndown "
-      "6\nforward 9\nforward 2\nforward 2\nforward 2\nforward 5\nup 3\ndown "
-      "7\ndown 6\ndown 8\nup 3\nup 9\ndown 3\nforward 1\nforward 7\ndown "
-      "7\ndown 1\nforward 3\ndown 7\ndown 9\ndown 7\ndown 3\nup 2\ndown 6\nup "
-      "6\ndown 1\nup 2\nforward 7\nup 2\ndown 7\nup 2\ndown 9\ndown 3\nforward "
-      "6\ndown 5\ndown 1\nforward 5\ndown 2\ndown 6\ndown 1\ndown 3\ndown "
-      "3\ndown 5\nforward 2\nforward 4\nforward 8\nforward 6\nforward "
-      "4\nforward 9\nup 8\ndown 5\nforward 1\ndown 1\nforward 1\nforward 6\nup "
-      "1\ndown 6\ndown 3\nforward 9\nforward 5\nforward 4\nup 3\nup 7\ndown "
-      "2\nup 4\nup 2\ndown 1\nforward 6\nforward 9\nforward 4\nforward 2\ndown "
-      "8\nforward 4\nforward 3\nup 5\ndown 4\nforward 3\ndown 8\ndown 5\ndown "
-      "5\nforward 1\nforward 6\nforward 4\nforward 5\nforward 9\nforward "
-      "5\ndown 4\nforward 3\nforward 8\ndown 8\ndown 1\nup 4\ndown 4\nup "
-      "7\nforward 2\nforward 6\ndown 3\ndown 5\ndown 5\ndown 8\nup 3\ndown "
-      "2\nforward 4\nforward 2\nforward 4\nforward 9\nup 2\ndown 7\nup 7\ndown "
-      "2\nforward 4\nup 7\nforward 4\ndown 2\nforward 7\nup 2\ndown 3\nforward "
-      "5\ndown 7\ndown 2\nup 2\nup 1\nup 7\nup 9\ndown 3\nforward 1\nforward "
-      "3\ndown 2\ndown 3\nforward 6\ndown 7\nforward 9\ndown 9\nforward "
-      "3\nforward 2\ndown 1\nup 9\ndown 4\nforward 4\nup 4\nforward 7\nup "
-      "3\ndown 4\ndown 9\ndown 3\nforward 7\ndown 6\ndown 7\ndown 6\nup "
-      "5\nforward 3\nforward 9\nup 2\nup 4\nup 9\ndown 2\nforward 5\nup "
-      "1\ndown 7\ndown 5\nup 2\nforward 8\ndown 8\nup 3\nforward 4\ndown "
-      "9\nforward 6\ndown 9\ndown 5\nforward 6\ndown 8\nup 6\ndown 3\nforward "
-      "6\nforward 3\ndown 3\ndown 5\ndown 7\ndown 1\ndown 5\ndown 7\ndown "
-      "5\nforward 3\ndown 2\nforward 4\nup 4\nup 1\nup 7\nforward 1\nforward "
-      "5\ndown 4\ndown 8\ndown 3\nforward 4\ndown 3\nup 7\ndown 6\nforward "
-      "9\nup 8\nforward 2\nforward 5\ndown 6\nup 4\nforward 8\nforward 5\ndown "
-      "6\nforward 2\ndown 7\nforward 3\nforward 1\nforward 6\ndown 9\nup "
-      "6\ndown 4\ndown 2\nup 8\nforward 4\ndown 8\nforward 8\nup 9\nforward "
-      "7\ndown 6\nup 9\ndown 4\nup 6\ndown 4\ndown 3\nup 7\nup 4\nforward "
-      "5\nup 9\ndown 9\nup 6\ndown 3\nforward 8\ndown 9\nforward 7\nup 3\nup "
-      "9\nforward 8\ndown 3\nforward 3\nforward 5\ndown 6\nforward 3\ndown "
-      "4\nup 6\nforward 3\nforward 7\ndown 1\ndown 6\ndown 4\nforward 6\nup "
-      "6\ndown 5\ndown 6\ndown 4\nup 2\ndown 7\ndown 9\ndown 2\ndown "
-      "6\nforward 3\nforward 4\ndown 5\nup 5\ndown 5\nforward 3\nforward "
-      "6\ndown 4\ndown 7\nup 2\nforward 7\ndown 7\nup 6\nup 3\nforward "
-      "9\nforward 8\nup 6\nforward 2\ndown 2\nforward 8\nforward 4\nup "
-      "6\nforward 6\ndown 8\nup 3\nup 5\nforward 6\nup 8\ndown 1\ndown 4\nup "
-      "9\nforward 6\nup 5\ndown 6\ndown 8\ndown 9\nforward 5\nup 3\ndown "
-      "7\nforward 3\nforward 6\ndown 3\ndown 1\ndown 9\nup 9\ndown 4\ndown "
-      "7\nforward 2\nforward 4\ndown 7\nforward 7\nup 5\ndown 9\nup 7\ndown "
-      "4\nforward 6\ndown 5\nforward 4\nup 8\ndown 4\ndown 7\nforward 3\ndown "
-      "6\ndown 1\nforward 3\ndown 4\nup 6\nup 5\nup 7\nforward 5\ndown "
-      "4\nforward 7\nup 1\ndown 4\nforward 4\ndown 2\ndown 6\nforward 1\nup "
-      "3\nup 8\nforward 6\nforward 6\ndown 5\nforward 7\ndown 6\ndown "
-      "8\nforward 6\ndown 6\nforward 3\nforward 5\ndown 9\ndown 5\nup 4\ndown "
-      "5\ndown 1\nforward 1\nforward 5\ndown 2\nforward 5\nforward 2\nforward "
-      "5\nup 3\nforward 5\nup 8\nforward 9\nforward 3\ndown 2\nup 2\nforward "
-      "7\ndown 5\nup 1\ndown 3\ndown 7\nup 2\nforward 8\nforward 6\nforward "
-      "1\nforward 6\nforward 6\ndown 5\nforward 4\ndown 5\nforward 9\nforward "
-      "7\ndown 7\ndown 7\ndown 9\nforward 4\ndown 4\nforward 3\ndown "
-      "6\nforward 5\ndown 9\nforward 6\nup 7\ndown 3\nup 4\nup 4\ndown 1\ndown "
-      "2\nup 5\nforward 6\nforward 2\ndown 7\nup 6\nup 3\ndown 8\nforward "
-      "1\ndown 3\nup 9\ndown 2\nforward 6\nforward 1\nforward 4\nup 1\ndown "
-      "8\ndown 2\ndown 9\ndown 5\nforward 3\ndown 1\ndown 6\ndown 5\ndown "
-      "3\nforward 1\nforward 9\nup 2\ndown 3\ndown 3\ndown 9\ndown 7\nforward "
-      "6\nforward 8\nforward 4\nup 7\ndown 2\nforward 3\nforward 1\nup "
-      "4\nforward 8\nup 9\nforward 8\nforward 2\ndown 5\nforward 2\ndown "
-      "6\ndown 6\ndown 4\nforward 8\ndown 6\nforward 2\nforward 8\ndown "
-      "7\ndown 6\nforward 2\ndown 1\ndown 8\nforward 2\nforward 9\nup "
-      "6\nforward 6\ndown 3\ndown 2\nup 5\nup 6\ndown 6\nup 7\nforward "
-      "5\nforward 7\ndown 1\nforward 7\nforward 9\ndown 3\nforward 4\nforward "
-      "5\ndown 1\nup 3\nforward 2\nup 5\nforward 2\nforward 1\ndown 5\ndown "
-      "4\ndown 8\nup 8\nforward 3\ndown 3\nforward 4\ndown 6\nup 8\ndown 5\nup "
-      "2\ndown 1\nup 3\nforward 8\nup 6\nforward 9\nup 9\ndown 5\nforward "
-      "2\nforward 9\nup 6\nforward 1\ndown 2\nforward 4\nforward 4\nforward "
-      "1\nforward 5\nforward 1\nforward 4\ndown 5\ndown 1\ndown 2\ndown "
-      "2\nforward 7\ndown 7\ndown 7\ndown 4\ndown 7\ndown 4\ndown 3\nup 7\nup "
-      "1\nforward 2\nforward 3\ndown 4\ndown 5\nforward 9\nup 7\nforward "
-      "6\ndown 1\nforward 6\nforward 6\nforward 8\ndown 3\nforward 2\ndown "
-      "6\nforward 9\nup 6\nup 6\nforward 7\ndown 5\ndown 6\nup 3\ndown 5\nup "
-      "4\nforward 3\ndown 7\nforward 9\nup 1\ndown 1\nup 6\ndown 3\nup 2\ndown "
-      "5\nforward 3\nforward 6\ndown 9\ndown 4\nforward 7\ndown 1\nup "
-      "1\nforward 3\nforward 5\nup 7\ndown 3\nup 9\nup 9\ndown 4\nup "
-      "4\nforward 8\nup 9\ndown 8\nforward 6\nforward 4\nforward 9\nforward "
-      "8\ndown 2\nforward 3\nforward 2\ndown 3\nup 1\nforward 6\ndown 3\ndown "
-      "7\ndown 3\ndown 5\ndown 9\nup 9\nforward 8\nforward 6\ndown 8\nforward "
-      "3\ndown 4\ndown 2\ndown 9\nforward 4\nforward 2\nup 4\nforward 1\nup "
-      "8\nup 1\ndown 4\nup 2\ndown 1\nup 7\ndown 2\ndown 4\nup 4\nforward "
-      "2\ndown 3\nforward 2\nforward 3\ndown 5\nforward 9\nforward 7\ndown "
-      "1\nup 3\ndown 3\nforward 3\ndown 6\nforward 5\nup 3\nup 3\nup "
-      "1\nforward 7\nforward 1\nforward 2\nforward 2\ndown 4\nup 7\nforward "
-      "1\nforward 1\nforward 6\ndown 8\nup 8\ndown 8\ndown 4\ndown 6\nforward "
-      "8\nforward 4\nforward 5\ndown 2\ndown 3\nforward 7\ndown 6\nforward "
-      "4\nforward 1\nup 7\nup 5\nup 2\nforward 1\nforward 8\nforward 2\nup "
-      "9\nforward 4\nforward 5\ndown 2\nforward 5\nforward 7\ndown 3\nforward "
-      "1\ndown 3\nup 5\nup 2\nup 2\nup 2\nforward 4\nforward 4\nforward "
-      "8\nforward 2\ndown 3\nup 7\ndown 4\ndown 2\ndown 7\nforward 2\ndown "
-      "2\nforward 7\nup 9\nup 7\nforward 7\nforward 7\ndown 3\ndown 4\nup "
-      "4\ndown 2\ndown 8\nforward 4\ndown 1\nup 6\nforward 4\ndown 2\nup "
-      "8\ndown 1\ndown 8\ndown 6\nup 9\nforward 4\nup 1\ndown 2\ndown 9\ndown "
-      "7\ndown 4\ndown 8\ndown 8\nup 1\ndown 5\nup 5\ndown 7\nup 7\nforward "
-      "5\ndown 3\nforward 7\nup 5\ndown 3\nforward 9\nup 5\ndown 7\nforward "
-      "8\nforward 8\ndown 2\nforward 7\nforward 8\ndown 4\nup 7\ndown 2\nup "
-      "7\nforward 5\ndown 1\ndown 3\nforward 9\nup 4\nforward 6\nforward "
-      "4\ndown 5\ndown 7\nforward 2\nforward 4\ndown 2\nforward 1\ndown 5\nup "
-      "2\ndown 8\ndown 1\ndown 4\ndown 8\ndown 6\nforward 9\nforward "
-      "2\nforward 6\nforward 4\ndown 1\nforward 8\nup 4\nforward 6\ndown "
-      "4\nforward 4\nforward 3\nforward 6\nforward 9\nforward 8\ndown "
-      "1\nforward 5\ndown 8\nforward 7\nup 1\ndown 3\nup 6\nforward 5\nforward "
-      "8\nforward 8\nforward 5\nforward 5\nforward 1\nup 9\nforward 7\nup "
-      "3\ndown 2\ndown 4\nforward 6\nup 2\nforward 5\nup 8\nforward 8\nforward "
-      "2\nforward 6\nforward 3\nup 4\nforward 3\nforward 6\n";
+  char *real_directions = readFile("day2_input.txt");
 
   int real_horizontal_position = 0;
   int real_vertical_position = 0;
@@ -213,5 +99,8 @@ int main() {
   printf("vertical position: %d, horizontal position: %d. product: %d\n",
          real_vertical_position, real_horizontal_position,
          real_vertical_position * real_horizontal_position);
+
+  free(test_directions);
+  free(real_directions);
   return 0;
 }
